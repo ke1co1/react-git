@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Button from "../components/Button";
 import InputBox from "../components/InputBox";
-import loadingSvg from "../img/loading.svg";
 import axios from "axios"
 
 const errorText = "Please enter github's user name.";
@@ -11,11 +10,11 @@ export default function GuessLanguage() {
   const [userName, setUserName] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [favoriteLangs, setFavoriteLangs] = useState([]);
+  const [favoriteLang, setFavoriteLang] = useState(null);
 
   const handleChange = (val) => {
     setUserName(val);
-    setFavoriteLangs([]);
+    setFavoriteLang(null);
   }
 
   const handleClick = async () => {
@@ -33,15 +32,8 @@ export default function GuessLanguage() {
           });
         }
       }
-      let aryValues = [];
-      for (const [key, value] of Object.entries(list)) {
-        aryValues.push({
-          lang: key,
-          frequency: value
-        });
-      }
-      aryValues.sort((a, b) => b.frequency - a.frequency);
-      setFavoriteLangs(aryValues.slice(0, 5));
+      const maxLang = Object.keys(list).reduce((a, b) => list[a] > list[b] ? a : b);
+      setFavoriteLang(maxLang);
     } else if (status === 404) {
       setError("Couldn't find user name.");
     } else {
@@ -78,12 +70,8 @@ export default function GuessLanguage() {
           Guess
         </Button>
       </div>
-      <h5 className="text-xl font-bold">Favorite Languages</h5>
-      <ol>
-        {favoriteLangs.map(({ lang }) => (
-          <li key={lang}>{lang}</li>
-        ))}
-      </ol>
+      <h5 className="text-xl font-bold">Favorite Language:</h5>
+      <p>{favoriteLang}</p>
     </>
   )
 }
